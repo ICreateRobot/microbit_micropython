@@ -5,12 +5,12 @@ import struct
 
 class s4s_mainBoard(iic_base.iic_base):
     CHARGING_REG           = 0x00
-    AMBIENT_LIGHT_REG      = 0x05
-    RTC_REG                = 0x0A
-    SERVO_REG              = 0x0F
-    VOICE_REG              = 0x14
-    ENCODER_MOTOR_REG      = [0x50, 0x5F, 0x6E, 0x7D]
-    ENCODER_MOTOR_PAIR_REG = 0x8C
+    AMBIENT_LIGHT_REG      = 0x0A
+    RTC_REG                = 0x14
+    SERVO_REG              = 0x1E
+    VOICE_REG              = 0x28
+    ENCODER_MOTOR_REG      = [0x50, 0x6E, 0x8C, 0xAA]
+    ENCODER_MOTOR_PAIR_REG = 0xC8
 
     def __init__(self, port=0, addr=0x0F):
         super().__init__(port, addr)
@@ -96,43 +96,57 @@ class s4s_mainBoard(iic_base.iic_base):
         buf = self.read_reg(self._motor_reg(motor_id) + 0, 4)
         return struct.unpack('>i', buf)[0]
 
-    def encoder_motor_get_speed(self, motor_id):
+    def encoder_motor_get_rpm_speed(self, motor_id):
         buf = self.read_reg(self._motor_reg(motor_id) + 1, 2)
         return struct.unpack('>h', buf)[0]
     
-    def encoder_motor_get_power(self, motor_id):
+    def encoder_motor_get_dynamic_speed(self, motor_id):
         buf = self.read_reg(self._motor_reg(motor_id) + 2, 2)
+        return struct.unpack('>h', buf)[0]
+    
+    def encoder_motor_get_power(self, motor_id):
+        buf = self.read_reg(self._motor_reg(motor_id) + 3, 2)
         return struct.unpack('>h', buf)[0]
     
     def encoder_motor_reset_angle(self, motor_id):
         self.write_reg(self._motor_reg(motor_id) + 0, [0, 0, 0, 0])
     
     def encoder_motor_set_action(self, motor_id, action):
-        self.write_reg(self._motor_reg(motor_id) + 3, [action])
+        self.write_reg(self._motor_reg(motor_id) + 4, [action])
 
-    def encoder_motor_set_speed(self, motor_id, speed):
-        """speed 0~..."""
+    def encoder_motor_set_rpm_speed(self, motor_id, speed):
+        """speed 0 ~ (100 ~ 180)"""
         data = list(struct.unpack('BB', struct.pack('>h', int(speed))))
-        self.write_reg(self._motor_reg(motor_id) + 4, data)
+        self.write_reg(self._motor_reg(motor_id) + 5, data)
+
+    def encoder_motor_set_dynamic_speed(self, motor_id, speed):
+        """speed 0 ~ 100"""
+        data = list(struct.unpack('BB', struct.pack('>h', int(speed))))
+        self.write_reg(self._motor_reg(motor_id) + 6, data)
 
     def encoder_motor_set_power(self, motor_id, power):
         """power 0~100"""
-        self.write_reg(self._motor_reg(motor_id) + 5, [power])
+        self.write_reg(self._motor_reg(motor_id) + 7, [power])
 
     def encoder_motor_set_ring(self, motor_id, ring):
         """ring 0~100"""
         data = list(struct.unpack('BB', struct.pack('>h', int(ring))))
-        self.write_reg(self._motor_reg(motor_id) + 6, data)
+        self.write_reg(self._motor_reg(motor_id) + 8, data)
 
     def encoder_motor_set_relative_angle(self, motor_id, angle):
         """angle 0~65535"""
         data = list(struct.unpack('BB', struct.pack('>h', int(angle))))
-        self.write_reg(self._motor_reg(motor_id) + 7, data)
+        self.write_reg(self._motor_reg(motor_id) + 9, data)
 
-    def encoder_motor_set_run_time(self, motor_id, time):
+    def encoder_motor_set_time(self, motor_id, time):
         """time 0~65535"""
         data = list(struct.unpack('BB', struct.pack('>h', int(time))))
-        self.write_reg(self._motor_reg(motor_id) + 8, data)
+        self.write_reg(self._motor_reg(motor_id) + 10, data)
+    
+    def encoder_motor_set_centimeters(self, motor_id, centimeters):
+        """centimeters 0~65535"""
+        data = list(struct.unpack('BB', struct.pack('>h', int(centimeters))))
+        self.write_reg(self._motor_reg(motor_id) + 11, data)
 
 
     # ---------------- 电机组 ----------------
@@ -142,14 +156,24 @@ class s4s_mainBoard(iic_base.iic_base):
     def encoder_motor_pair_set_group(self, l_motor, r_motor):
         self.write_reg(self.ENCODER_MOTOR_PAIR_REG+1, [l_motor, r_motor])
 
-    def encoder_motor_pair_set_run_speed(self, l_speed, r_speed):
+    def encoder_motor_pair_set_dynamic_speed(self, l_speed, r_speed):
         data1 = list(struct.unpack('BB', struct.pack('>h', int(l_speed))))
         data2 = list(struct.unpack('BB', struct.pack('>h', int(r_speed))))
         self.write_reg(self.ENCODER_MOTOR_PAIR_REG+2, data1+data2)
 
-    def encoder_motor_pair_set_run_time(self, l_time):
-        data = list(struct.unpack('BB', struct.pack('>h', int(l_time))))
+    def encoder_motor_pair_set_time(self, time):
+        data = list(struct.unpack('BB', struct.pack('>h', int(time))))
         self.write_reg(self.ENCODER_MOTOR_PAIR_REG+3, data)
+
+    def encoder_motor_pair_set_ring(self, l_ring, r_ring):
+        data1 = list(struct.unpack('BB', struct.pack('>h', int(l_ring))))
+        data2 = list(struct.unpack('BB', struct.pack('>h', int(r_ring))))
+        self.write_reg(self.ENCODER_MOTOR_PAIR_REG+4, data1+data2)
+    
+    def encoder_motor_pair_set_centimeters(self, l_centimeters, r_centimeters):
+        data1 = list(struct.unpack('BB', struct.pack('>h', int(l_centimeters))))
+        data2 = list(struct.unpack('BB', struct.pack('>h', int(r_centimeters))))
+        self.write_reg(self.ENCODER_MOTOR_PAIR_REG+5, data1+data2)
 
     # ------------------ 语音模块 -------------------------
     def voice_get_state(self):
