@@ -116,35 +116,42 @@ class s4s_mainBoard(iic_base.iic_base):
 
     def encoder_motor_set_rpm_speed(self, motor_id, speed):
         """speed 0 ~ (100 ~ 180)"""
+        speed = max(0, min(180, speed))
         data = list(struct.unpack('BB', struct.pack('>h', int(speed))))
         self.write_reg(self._motor_reg(motor_id) + 5, data)
 
     def encoder_motor_set_dynamic_speed(self, motor_id, speed):
         """speed 0 ~ 100"""
+        speed = max(0, min(100, speed))
         data = list(struct.unpack('BB', struct.pack('>h', int(speed))))
         self.write_reg(self._motor_reg(motor_id) + 6, data)
 
     def encoder_motor_set_power(self, motor_id, power):
         """power 0~100"""
-        self.write_reg(self._motor_reg(motor_id) + 7, [power])
+        power = max(0, min(100, power))
+        self.write_reg(self._motor_reg(motor_id) + 7, [int(power)])
 
     def encoder_motor_set_ring(self, motor_id, ring):
-        """ring 0~100"""
+        """ring 0~65535"""
+        ring = max(0, min(100, 65535))
         data = list(struct.unpack('BB', struct.pack('>h', int(ring))))
         self.write_reg(self._motor_reg(motor_id) + 8, data)
 
     def encoder_motor_set_relative_angle(self, motor_id, angle):
         """angle 0~65535"""
+        angle = max(0, min(65535, angle))
         data = list(struct.unpack('BB', struct.pack('>h', int(angle))))
         self.write_reg(self._motor_reg(motor_id) + 9, data)
 
     def encoder_motor_set_time(self, motor_id, time):
         """time 0~65535"""
+        time = max(0, min(65535, time))
         data = list(struct.unpack('BB', struct.pack('>h', int(time))))
         self.write_reg(self._motor_reg(motor_id) + 10, data)
     
     def encoder_motor_set_centimeters(self, motor_id, centimeters):
-        """centimeters 0~65535"""
+        """centimeters 0~1000"""
+        centimeters = max(0, min(1000, centimeters))
         data = list(struct.unpack('BB', struct.pack('>h', int(centimeters))))
         self.write_reg(self._motor_reg(motor_id) + 11, data)
 
@@ -157,20 +164,26 @@ class s4s_mainBoard(iic_base.iic_base):
         self.write_reg(self.ENCODER_MOTOR_PAIR_REG+1, [l_motor, r_motor])
 
     def encoder_motor_pair_set_dynamic_speed(self, l_speed, r_speed):
+        l_speed = max(0, min(100, l_speed))
+        r_speed = max(0, min(100, r_speed))
         data1 = list(struct.unpack('BB', struct.pack('>h', int(l_speed))))
         data2 = list(struct.unpack('BB', struct.pack('>h', int(r_speed))))
         self.write_reg(self.ENCODER_MOTOR_PAIR_REG+2, data1+data2)
 
     def encoder_motor_pair_set_time(self, time):
+        time = max(0, min(65535, time))
         data = list(struct.unpack('BB', struct.pack('>h', int(time))))
         self.write_reg(self.ENCODER_MOTOR_PAIR_REG+3, data)
 
     def encoder_motor_pair_set_ring(self, l_ring, r_ring):
+        l_ring = max(0, min(65535, l_ring))
         data1 = list(struct.unpack('BB', struct.pack('>h', int(l_ring))))
         data2 = list(struct.unpack('BB', struct.pack('>h', int(r_ring))))
         self.write_reg(self.ENCODER_MOTOR_PAIR_REG+4, data1+data2)
     
     def encoder_motor_pair_set_centimeters(self, l_centimeters, r_centimeters):
+        l_centimeters = max(0, min(1000, l_centimeters))
+        r_centimeters = max(0, min(1000, r_centimeters))
         data1 = list(struct.unpack('BB', struct.pack('>h', int(l_centimeters))))
         data2 = list(struct.unpack('BB', struct.pack('>h', int(r_centimeters))))
         self.write_reg(self.ENCODER_MOTOR_PAIR_REG+5, data1+data2)
