@@ -149,7 +149,7 @@ class s4s_mainBoard(iic_base.iic_base):
         data = list(struct.unpack('BB', struct.pack('>h', int(time))))
         self.write_reg(self._motor_reg(motor_id) + 10, data)
     
-    def encoder_motor_set_centimeters(self, motor_id, centimeters):
+    def encoder_motor_set_centimeter(self, motor_id, centimeters):
         """centimeters 0~1000"""
         centimeters = max(0, min(1000, centimeters))
         data = list(struct.unpack('BB', struct.pack('>h', int(centimeters))))
@@ -181,7 +181,7 @@ class s4s_mainBoard(iic_base.iic_base):
         data2 = list(struct.unpack('BB', struct.pack('>h', int(r_ring))))
         self.write_reg(self.ENCODER_MOTOR_PAIR_REG+4, data1+data2)
     
-    def encoder_motor_pair_set_centimeters(self, l_centimeters, r_centimeters):
+    def encoder_motor_pair_set_centimeter(self, l_centimeters, r_centimeters):
         l_centimeters = max(0, min(1000, l_centimeters))
         r_centimeters = max(0, min(1000, r_centimeters))
         data1 = list(struct.unpack('BB', struct.pack('>h', int(l_centimeters))))

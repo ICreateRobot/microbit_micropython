@@ -34,7 +34,7 @@ def encoder_motor_run_3state(motor, dir, data, state):
         mainBoard.encoder_motor_set_ring(motor, data)
         mainBoard.encoder_motor_set_action(motor, dir+7)
     elif state == 2:
-        mainBoard.encoder_motor_set_centimeters(motor, data)
+        mainBoard.encoder_motor_set_centimeter(motor, data)
         mainBoard.encoder_motor_set_action(motor, dir+13)
 
 '''
@@ -54,7 +54,7 @@ def encoder_motor_stop(motor):
 电机【】设置速度【0-100】 
 '''
 def encoder_motor_set_dynamic_speed(motor, speed):
-    mainBoard.encoder_motor_get_dynamic_speed(motor, speed)
+    mainBoard.encoder_motor_set_dynamic_speed(motor, speed)
 
 '''
 电机【】位置
@@ -115,7 +115,7 @@ def encoder_motor_pair_run_for(state, data, _for):
         mainBoard.encoder_motor_pair_set_ring(data)
         mainBoard.encoder_motor_pair_set_action(state + 9)
     elif _for == 2:
-        mainBoard.encoder_motor_pair_set_centimeters(data)
+        mainBoard.encoder_motor_pair_set_centimeter(data)
         mainBoard.encoder_motor_pair_set_action(state + 13)
 
 '''
