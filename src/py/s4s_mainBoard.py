@@ -155,7 +155,9 @@ class s4s_mainBoard(iic_base.iic_base):
         data = list(struct.unpack('BB', struct.pack('>h', int(centimeters))))
         self.write_reg(self._motor_reg(motor_id) + 11, data)
 
-
+    def encoder_motor_get_action_runing(self, motor_id):
+        return self.read_reg(self._motor_reg(motor_id) + 12, 1)[0]
+    
     # ---------------- 电机组 ----------------
     def encoder_motor_pair_set_action(self, action):
         self.write_reg(self.ENCODER_MOTOR_PAIR_REG+0, [action])
@@ -187,6 +189,9 @@ class s4s_mainBoard(iic_base.iic_base):
         data1 = list(struct.unpack('BB', struct.pack('>h', int(l_centimeters))))
         data2 = list(struct.unpack('BB', struct.pack('>h', int(r_centimeters))))
         self.write_reg(self.ENCODER_MOTOR_PAIR_REG+5, data1+data2)
+
+    def encoder_motor_pair_get_action_runing(self):
+        return self.read_reg(self.ENCODER_MOTOR_PAIR_REG+6, 1)[0]
 
     # ------------------ 语音模块 -------------------------
     def voice_get_state(self):

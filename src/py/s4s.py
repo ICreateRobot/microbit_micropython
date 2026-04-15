@@ -7,6 +7,7 @@ import speech
 mainBoard = s4s_mainBoard.s4s_mainBoard()
 gray = s4s_gray.s4s_gray()
 ultr = s4s_ultr.s4s_ultr()
+import time
 
 def uartReadLine():
     ic_uart_read = uart.readline()
@@ -25,8 +26,10 @@ def toggle(x,y):
 dir : 0 正转；1反转
 data:
 state: 0秒，1圈，2厘米
+timeout: -1无限等待，>=0 最长等待时间 （单位：秒）
 '''
-def encoder_motor_run_3state(motor, dir, data, state):
+def encoder_motor_run_3state(motor, dir, data, state, timeout=-1):
+    last_time = time.ticks_ms()
     if state == 0:
         mainBoard.encoder_motor_set_time(motor, data)
         mainBoard.encoder_motor_set_action(motor, dir+11)
@@ -36,7 +39,12 @@ def encoder_motor_run_3state(motor, dir, data, state):
     elif state == 2:
         mainBoard.encoder_motor_set_centimeter(motor, data)
         mainBoard.encoder_motor_set_action(motor, dir+13)
-
+    time.sleep_ms(100)
+    while True:
+        if 0 == mainBoard.encoder_motor_get_action_runing(motor):
+            break
+        if timeout >= 0 and time.ticks_diff(time.ticks_ms(), last_time) > timeout*1000:
+            break
 '''
 电机【】以【】启动电机 （动态速度）
 dir : 0 正转；1反转
@@ -106,8 +114,10 @@ def encoder_motor_pair_run(state):
 移动【state】以 【data】【for】
 state : 0前进；1后退；2左转；3右转
 for   ：0秒，1圈，2厘米
+timeout: -1无限等待，>=0 最长等待时间 （单位：秒）
 '''
-def encoder_motor_pair_run_for(state, data, _for):
+def encoder_motor_pair_run_for(state, data, _for, timeout=-1):
+    last_time = time.ticks_ms()
     if _for  == 0:
         mainBoard.encoder_motor_pair_set_time(data)
         mainBoard.encoder_motor_pair_set_action(state + 5)
@@ -117,7 +127,12 @@ def encoder_motor_pair_run_for(state, data, _for):
     elif _for == 2:
         mainBoard.encoder_motor_pair_set_centimeter(data)
         mainBoard.encoder_motor_pair_set_action(state + 13)
-
+    time.sleep_ms(100)
+    while True:
+        if 0 == mainBoard.encoder_motor_pair_get_action_runing():
+            break
+        if timeout >= 0 and time.ticks_diff(time.ticks_ms(), last_time) > timeout*1000:
+            break
 '''
 移动【】【】速度%
 '''
