@@ -133,7 +133,7 @@ class s4s_mainBoard(iic_base.iic_base):
 
     def encoder_motor_set_ring(self, motor_id, ring):
         """ring 0~65535"""
-        ring = max(0, min(100, 65535))
+        ring = max(0, min(65535, ring))
         data = list(struct.unpack('BB', struct.pack('>h', int(ring))))
         self.write_reg(self._motor_reg(motor_id) + 8, data)
 

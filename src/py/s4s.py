@@ -25,7 +25,7 @@ def toggle(x,y):
 电机【】以【】运行【0-...】【】
 dir : 0 正转；1反转
 data:
-state: 0秒，1圈，2厘米
+state: 0秒，1圈，2厘米, 3角度
 timeout: -1无限等待，>=0 最长等待时间 （单位：秒）
 '''
 def encoder_motor_run_3state(motor, dir, data, state, timeout=-1):
@@ -39,6 +39,9 @@ def encoder_motor_run_3state(motor, dir, data, state, timeout=-1):
     elif state == 2:
         mainBoard.encoder_motor_set_centimeter(motor, data)
         mainBoard.encoder_motor_set_action(motor, dir+13)
+    elif state == 3:
+        mainBoard.encoder_motor_set_relative_angle(motor, data)
+        mainBoard.encoder_motor_set_action(motor, dir+9)
     time.sleep_ms(100)
     while True:
         if 0 == mainBoard.encoder_motor_get_action_runing(motor):
