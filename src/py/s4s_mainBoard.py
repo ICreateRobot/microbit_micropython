@@ -86,6 +86,12 @@ class s4s_mainBoard(iic_base.iic_base):
             raise ValueError("servo_id only 0 or 1")
         self.write_reg(self.SERVO_REG + servo_id + 2, [struct.unpack('B', struct.pack('b', speed))[0]])
 
+    def servo_release(self, servo_id):
+        """servo_id 0/1"""
+        if servo_id > 1:
+            raise ValueError("servo_id only 0 or 1")
+        self.write_reg(self.SERVO_REG + servo_id + 4, [0])
+
     # ---------------- 编码电机 ----------------
     def _motor_reg(self, motor_id):
         if motor_id > 3:

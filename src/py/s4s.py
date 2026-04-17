@@ -125,10 +125,10 @@ def encoder_motor_pair_run_for(state, data, _for, timeout=-1):
         mainBoard.encoder_motor_pair_set_time(data)
         mainBoard.encoder_motor_pair_set_action(state + 5)
     elif _for == 1:
-        mainBoard.encoder_motor_pair_set_ring(data)
+        mainBoard.encoder_motor_pair_set_ring(data, data)
         mainBoard.encoder_motor_pair_set_action(state + 9)
     elif _for == 2:
-        mainBoard.encoder_motor_pair_set_centimeter(data)
+        mainBoard.encoder_motor_pair_set_centimeter(data, data)
         mainBoard.encoder_motor_pair_set_action(state + 13)
     time.sleep_ms(100)
     while True:
@@ -136,11 +136,30 @@ def encoder_motor_pair_run_for(state, data, _for, timeout=-1):
             break
         if timeout >= 0 and time.ticks_diff(time.ticks_ms(), last_time) > timeout*1000:
             break
+
+'''
+移动【state】以 【data】【for】
+l_speed: 左轮速度
+r_speed: 右轮速度
+data
+for   ：0秒，1圈，2厘米
+timeout: -1无限等待，>=0 最长等待时间 （单位：秒）
+'''
+def encoder_motor_pair_speed_run_for(l_speed, r_speed, data, _for, timeout=-1):
+    encoder_motor_pair_set_dynamic_speed(l_speed, r_speed)
+    if l_speed>=0 and r_speed>=0:
+        encoder_motor_pair_run_for(0, data, _for, timeout)
+    elif l_speed<=0 and r_speed<=0:
+        encoder_motor_pair_run_for(1, data, _for, timeout)
+    elif l_speed<=0 and r_speed>=0:
+        encoder_motor_pair_run_for(2, data, _for, timeout)
+    elif l_speed>=0 and r_speed<=0:
+        encoder_motor_pair_run_for(3, data, _for, timeout)
 '''
 移动【】【】速度%
 '''
 def encoder_motor_pair_run_dynamic_speed(l_speed, r_speed):
-    mainBoard.encoder_motor_pair_set_dynamic_speed(abs(l_speed), abs(r_speed))
+    encoder_motor_pair_set_dynamic_speed(l_speed, r_speed)
     if l_speed >= 0 and r_speed >= 0:
         mainBoard.encoder_motor_pair_set_action(1)
     elif l_speed <= 0 and r_speed <= 0:
@@ -159,5 +178,7 @@ def encoder_motor_pair_stop():
 '''
 设置移动速度在【】%
 '''
-def encoder_motor_pair_set_dynamic_speed(speed):
-    mainBoard.encoder_motor_pair_set_dynamic_speed(abs(speed), abs(speed))
+def encoder_motor_pair_set_dynamic_speed(l_speed, r_speed):
+    mainBoard.encoder_motor_pair_set_dynamic_speed(abs(l_speed), abs(r_speed))
+
+
